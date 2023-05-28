@@ -1,8 +1,12 @@
-import os 
+import os
+from pandas.core.dtypes.common import classes 
 import torch 
 import sys
 from pathlib import Path
 import argparse
+
+from model_loader import Model
+from dataloader import load_dataset
 
 sys.path.insert(0, '../../yolov5/')
 from utils.dataloaders import IMG_FORMATS, VID_FORMATS
@@ -48,6 +52,20 @@ def run(
 
     # Directories 
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)
+    
+    # Load Model
+    model = Model(weights=weights, data_yaml=data, **kwargs)
+    
+    # Loading dataloaders
+    dataset = load_dataset(source=source, is_url=is_url, stride=model.stride, auto=model.pt, **kwargs)
+    
+    # Run inference
+    seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
+
+    for path, im, im0s, vid_cap, s in dataset:
+        preds, dt = model(path, im, save_dir, dt, **kwargs)
+        
 
 if __name__ == "__main__":
-    run(weights='../../yolov5/we')
+    run(weights='../../yolov5s.pt', source='', data='/workspace/try1/yolov5/data/coco128.yaml', imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=max_det)
+
