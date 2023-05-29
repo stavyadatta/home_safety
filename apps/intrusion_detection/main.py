@@ -9,14 +9,16 @@ from model_loader import Model
 from dataloader import load_dataset
 
 sys.path.insert(0, '../../yolov5/')
+YOLOV5_ROOT = Path('/workspace/try1/yolov5/')
+
 from utils.dataloaders import IMG_FORMATS, VID_FORMATS
 from utils.general import (LOGGER, Profile, check_file, increment_path)
 
 
 def run(
-        weights=ROOT / 'yolov5s.pt',  # model path or triton URL
-        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
-        data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
+        weights=YOLOV5_ROOT / 'yolov5s.pt',  # model path or triton URL
+        source=YOLOV5_ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        data= YOLOV5_ROOT / 'data/coco128.yaml',  # dataset.yaml path
         **kwargs,
         # imgsz=(640, 640),  # inference size (height, width)
         # conf_thres=0.25,  # confidence threshold
@@ -44,14 +46,14 @@ def run(
         # vid_stride=1,  # video frame-rate stride
 ):
     source = str(source)
-    save_img = not nosave and not source.endswith('.txt')  # save inference images
+    save_img = not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS )
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
     if is_url and is_file:
         source = check_file(source)
 
     # Directories 
-    save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)
+    save_dir = increment_path(Path(YOLOV5_ROOT / 'runs/detect') / 'exp', exist_ok=False)
     
     # Load Model
     model = Model(weights=weights, data_yaml=data, **kwargs)
@@ -64,8 +66,9 @@ def run(
 
     for path, im, im0s, vid_cap, s in dataset:
         preds, dt = model(path, im, save_dir, dt, **kwargs)
+        print(preds)
         
 
 if __name__ == "__main__":
-    run(weights='../../yolov5s.pt', source='', data='/workspace/try1/yolov5/data/coco128.yaml', imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=max_det)
+    run(source='rtsp://admin:admin@192.168.1.11:554', data='/workspace/try1/yolov5/data/coco128.yaml', imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=1000, device=torch.)
 

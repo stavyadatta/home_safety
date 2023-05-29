@@ -863,6 +863,7 @@ def non_max_suppression(
         labels=(),
         max_det=300,
         nm=0,  # number of masks
+        **kwargs
 ):
     """Non-Maximum Suppression (NMS) on inference results to reject overlapping detections
 

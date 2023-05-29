@@ -14,7 +14,7 @@ class Model(object):
         self.device = select_device(device)
         self.model = DetectMultiBackend(weights=weights, device=device, dnn=dnn, data=data_yaml, fp16=fp16)
         self.stride, self.names, self.pt = self.model.stride, self.model.names, self.model.pt
-        self.imgsz = check_img_size(imgsz=imgsz, s=stride)
+        self.imgsz = check_img_size(imgsz=imgsz, s=self.stride)
         
         # Batchsize
         bs = 1
@@ -29,8 +29,9 @@ class Model(object):
                 im = im[None]
 
         with dt[1]:
-            visualize = increment_path(save_dir / Path(path).stem, mkdir=True) 
-            pred = self.model(im, augment=False, visualize=visualize)
+            # print(path)
+            # visualize = increment_path(save_dir / Path(path).stem, mkdir=True) 
+            pred = self.model(im, augment=False, visualize=False)
 
         with dt[2]:
             pred = non_max_suppression(pred, **kwargs)
