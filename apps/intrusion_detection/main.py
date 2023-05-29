@@ -1,5 +1,4 @@
 import os
-from pandas.core.dtypes.common import classes 
 import torch 
 import sys
 from pathlib import Path
@@ -7,6 +6,7 @@ import argparse
 
 from model_loader import Model
 from dataloader import load_dataset
+from tracker import Tracker
 
 sys.path.insert(0, '../../yolov5/')
 YOLOV5_ROOT = Path('/workspace/try1/yolov5/')
@@ -57,6 +57,9 @@ def run(
     
     # Load Model
     model = Model(weights=weights, data_yaml=data, **kwargs)
+
+    # Initializing the tracker 
+    tracker = Tracker()
     
     # Loading dataloaders
     dataset = load_dataset(source=source, is_url=is_url, stride=model.stride, auto=model.pt, **kwargs)
@@ -66,7 +69,8 @@ def run(
 
     for path, im, im0s, vid_cap, s in dataset:
         preds, dt = model(path, im, save_dir, dt, **kwargs)
-        print(preds)
+        pred = tracker(preds)
+        print(pred)
         
 
 if __name__ == "__main__":
