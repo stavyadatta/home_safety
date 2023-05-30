@@ -10,9 +10,7 @@ class Tracker(object):
     def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
         self.tracker = Sort(max_age, min_hits, iou_threshold)
 
-    def __call__(self, preds):
-        for i, det in enumerate(preds):
-            trackers = self.tracker.update(det[:, :5]) 
-            print(trackers)
+    def __call__(self, dets):
+        return self.tracker.update(dets[:,:5])
 
             
