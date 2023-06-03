@@ -6,7 +6,8 @@ from random import randint
 
 sys.path.insert(0, '../../yolov5')
 from utils.plots import Annotator, colors
-from utils.general import scale_boxes, LOGGER
+from utils.general import scale_boxes, LOGGER, increment_path
+from img_output import save_img
 
 def annotation(dets, 
                pred_index,
@@ -33,7 +34,7 @@ def annotation(dets,
         p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
 
     p = Path(p)
-    save_path = str(save_dir / p.name)
+    save_path = str(save_dir / p.name) + '.jpg'
     txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # im.txt
     s += '%gx%g ' % im.shape[2:]  # print string
     gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
@@ -54,8 +55,11 @@ def annotation(dets,
             label = f'{names[c]} {conf:.2f}'
             annotator.box_label(xyxy, label, color=colors(c, True))
 
+    # Saving the image in directories
     im0 = annotator.result()
-    cv2.imwrite(f'/workspace/videos/very_nice{randint(0, 1000)}.jpg', im0)
+    save_img(im0, save_path)
+    save_path = increment_path(save_path)
+    cv2.imwrite(str(save_path.absolute()), img)
 
 
 

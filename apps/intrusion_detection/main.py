@@ -60,7 +60,7 @@ def run(
         source = check_file(source)
 
     # Directories 
-    save_dir = increment_path(Path(YOLOV5_ROOT / 'runs/detect') / 'exp', exist_ok=False)
+    save_dir = increment_path(Path('/workspace/try1/output/') / 'exp', exist_ok=False, mkdir=True)
     # Load Model
     model = Model(weights=weights, data_yaml=data, **kwargs)
     # Initializing the tracker 
