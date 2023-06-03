@@ -1,9 +1,11 @@
 import sys
 import torch
+import cv2
 from pathlib import Path
+from random import randint
 
 sys.path.insert(0, '../../yolov5')
-from utils.plots import Annotator
+from utils.plots import Annotator, colors
 from utils.general import scale_boxes, LOGGER
 
 def annotation(dets, 
@@ -46,6 +48,15 @@ def annotation(dets,
             n = (dets[:, 5] == c).sum()  # detections per class
             s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
-        LOGGER.info(f"{s}{'' if len(dets) else '(no detections), '}")
+        # Write the results in frame
+        for *xyxy, conf, cls in reversed(dets):
+            c = int(cls)
+            label = f'{names[c]} {conf:.2f}'
+            annotator.box_label(xyxy, label, color=colors(c, True))
+
+    im0 = annotator.result()
+    cv2.imwrite(f'/workspace/videos/very_nice{randint(0, 1000)}.jpg', im0)
+
+
 
 
