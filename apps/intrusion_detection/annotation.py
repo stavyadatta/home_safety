@@ -7,7 +7,6 @@ from random import randint
 sys.path.insert(0, '../../yolov5')
 from utils.plots import Annotator, colors
 from utils.general import scale_boxes, LOGGER, increment_path
-from img_output import save_img
 
 def annotation(dets, 
                pred_index,
@@ -38,8 +37,7 @@ def annotation(dets,
     txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # im.txt
     s += '%gx%g ' % im.shape[2:]  # print string
     gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-    imc = im0 # for save_crop
-    annotator = Annotator(im0, line_width=3, example=str(names))
+    annotator = Annotator(im0, line_width=3, example=str(names), font_size=5)
 
     if len(dets):
         dets[:, :4] = scale_boxes(im.shape[2:], dets[:, :4], im0.shape)
@@ -50,16 +48,15 @@ def annotation(dets,
             s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
         # Write the results in frame
-        for *xyxy, conf, cls in reversed(dets):
+        for *xyxy, conf, cls, track_id in dets:
             c = int(cls)
-            label = f'{names[c]} {conf:.2f}'
+            label = f'{names[c]} {conf:.2f}, {track_id}'
             annotator.box_label(xyxy, label, color=colors(c, True))
 
     # Saving the image in directories
     im0 = annotator.result()
-    save_img(im0, save_path)
     save_path = increment_path(save_path)
-    cv2.imwrite(str(save_path.absolute()), img)
+    cv2.imwrite(str(save_path.absolute()), im0)
 
 
 
