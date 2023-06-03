@@ -1,4 +1,5 @@
 import os
+import cv2
 import torch 
 import sys
 from pathlib import Path
@@ -16,10 +17,19 @@ from utils.dataloaders import IMG_FORMATS, VID_FORMATS
 from utils.general import (LOGGER, Profile, check_file, increment_path)
 
 
-def processing_predictions(preds, tracker: Tracker, **kwargs):
+      
+cap = cv2.VideoCapture('rtsp://admin:admin@192.168.1.11:554')
+w= int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+h= int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = int(cap.get(cv2.CAP_PROP_FPS))
+fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+vid_write = cv2.VideoWriter('/workspace/something_1.mp4', fourcc, fps, (w, h))
+
+def processing_predictions(preds, tracker: Tracker, im0s, **kwargs):
     for i, dets in enumerate(preds):
+        print("The value of i is this only", i)
         tracks = tracker(dets)
-        annotation(pred_index=i, dets=dets, tracks=tracks, **kwargs)
+        annotation(pred_index=i, dets=dets, tracks=tracks, vid_write=vid_write, im0s=im0s, **kwargs)
 
 
 def run(
@@ -66,7 +76,8 @@ def run(
     # Initializing the tracker 
     tracker = Tracker()
     # Loading dataloaders
-    dataset = load_dataset(source=source, is_url=is_url, stride=model.stride, auto=model.pt, **kwargs)
+    dataset, bs = load_dataset(source=source, is_url=is_url, stride=model.stride, auto=model.pt, **kwargs)
+    vid_path, vid_writer = [None] * bs, [None] * bs
     
     # Run inference
     seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
@@ -86,6 +97,8 @@ def run(
                                s=s, 
                                names=model.names,
                                is_url=is_url,
+                               vid_path=vid_path,
+                               vid_writer=vid_writer,
         )
 
 if __name__ == "__main__":

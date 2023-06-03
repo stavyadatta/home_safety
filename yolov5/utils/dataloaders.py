@@ -406,6 +406,7 @@ class LoadStreams:
         return self
 
     def __next__(self):
+        print("This is the when the next is getting called in the dataset")
         self.count += 1
         if not all(x.is_alive() for x in self.threads) or cv2.waitKey(1) == ord('q'):  # q to quit
             cv2.destroyAllWindows()
