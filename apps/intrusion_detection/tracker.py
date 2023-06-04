@@ -1,9 +1,7 @@
 import sys
 
 sys.path.insert(0, '../../sort/')
-sys.path.insert(1, '../../yolov5')
 
-from utils.general import scale_boxes
 from sort import Sort
 
 class Tracker(object):

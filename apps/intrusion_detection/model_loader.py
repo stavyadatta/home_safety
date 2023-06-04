@@ -10,7 +10,7 @@ from models.common import DetectMultiBackend
 from utils.torch_utils import select_device
 
 class Model(object):
-    def __init__(self, weights, device='', dnn=False, data_yaml='/workspace/try1/yolov5/data/coco128.yaml', fp16=False, imgsz=(640, 640), **kwargs):
+    def __init__(self, weights, device='', dnn=False, data_yaml=Path('/workspace/try1/yolov5/data/coco128.yaml'), fp16=False, imgsz=(640, 640), **kwargs):
         self.device = select_device(device)
         self.model = DetectMultiBackend(weights=weights, device=device, dnn=dnn, data=data_yaml, fp16=fp16)
         self.stride, self.names, self.pt = self.model.stride, self.model.names, self.model.pt

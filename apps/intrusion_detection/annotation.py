@@ -57,6 +57,7 @@ def annotation(dets,
     im0 = annotator.result()
     save_path = increment_path(save_path)
     cv2.imwrite(str(save_path.absolute()), im0)
+    LOGGER.info(f"{s}{'' if len(dets) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
 
 
 
