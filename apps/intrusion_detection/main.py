@@ -2,6 +2,7 @@ import torch
 import sys
 from pathlib import Path
 import argparse
+import torch._dynamo.config
 
 from model_loader import Model
 from dataloader import load_dataset
@@ -10,6 +11,7 @@ from annotation import annotation
 
 sys.path.insert(0, '../../yolov5/')
 YOLOV5_ROOT = Path('/workspace/try1/yolov5/')
+torch._dynamo.config.suppress_errors = True
 
 from utils.dataloaders import IMG_FORMATS, VID_FORMATS
 from utils.general import (LOGGER, Profile, check_file, increment_path)
@@ -37,11 +39,11 @@ class IntrusionDetection():
             annotation_parameter = {'pred_index':i, 'dets':dets, 'tracks':tracks}
             annotation_parameter.update(kwargs)
             self.update_annotation_params(annotation_parameter)
-            # annotation(pred_index=i, dets=dets, tracks=tracks, **kwargs)
+            self.tracker = Tracker()
 
     def run(
             self,
-            weights= '/workspace/try1/crowdhuman_yolov5m.pt',
+            weights= '/workspace/try1/crowdhuman_yolov5m_openvino_model/',
             source=YOLOV5_ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
             data= YOLOV5_ROOT / 'data/person.yaml',  # dathhhhset.yaml path
             **kwargs,
@@ -58,7 +60,6 @@ class IntrusionDetection():
         # Load Model
         model = Model(weights=weights, data_yaml=data, **kwargs)
         # Initializing the tracker 
-        tracker = Tracker()
         # Loading dataloaders
         dataset = load_dataset(source=source, is_url=is_url, stride=model.stride, auto=model.pt, **kwargs)
         
@@ -67,9 +68,8 @@ class IntrusionDetection():
         for path, im, im0s, vid_cap, s in dataset:
             preds, dt = model(path, im, save_dir, dt, **kwargs)
             LOGGER.info(f"The timing is {dt[1].dt * 1E3:.1f}ms")
-            # LOGGER.info(f"{s}{'' if len(dets) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
             self.processing_predictions(preds=preds, 
-                                tracker=tracker,
+                                tracker=self.tracker,
                                 dt=dt, 
                                 seen=seen, 
                                 windows=windows, 
@@ -87,7 +87,7 @@ class IntrusionDetection():
 if __name__ == "__main__":
     intrusion_detection = IntrusionDetection()
     try:
-        intrusion_detection.run(source='rtsp://admin:admin@192.168.1.11:554', data=Path('/workspace/try1/yolov5/data/coco128.yaml'), imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=1000, device=torch.device('cpu'))
+        intrusion_detection.run(source='rtsp://admin:admin@192.168.1.11:554', data=Path('/workspace/try1/yolov5/data/person.yaml'), imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=1000, device=torch.device('cpu'))
     except KeyboardInterrupt:
         intrusion_detection.annotation_intrusion()
 
