@@ -35,12 +35,12 @@ def annotation(dets,
     p = Path(p)
     save_path = str(save_dir / p.name) + '.jpg'
     txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # im.txt
-    s += '%gx%g ' % im.shape[2:]  # print string
+    s += '%gx%g '.format(im.shape[2:])  # print string
     gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
     annotator = Annotator(im0, line_width=3, example=str(names), font_size=5)
 
     if len(dets):
-        dets[:, :4] = scale_boxes(im.shape[2:], dets[:, :4], im0.shape)
+        dets[:, :4] = scale_boxes(im.shape[1:], dets[:, :4], im0.transpose(2,0,1).shape[1:])
 
         # Print results
         for c in dets[:, 5].unique():

@@ -87,7 +87,7 @@ class IntrusionDetection():
 if __name__ == "__main__":
     intrusion_detection = IntrusionDetection()
     try:
-        intrusion_detection.run(source='rtsp://admin:admin@192.168.1.11:554', data=Path('/workspace/try1/yolov5/data/coco128.yaml'), imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=1000, device=torch.device('cpu'))
+        intrusion_detection.run(source='/workspace/try1/sample_video.mp4', data=Path('/workspace/try1/yolov5/data/coco128.yaml'), imgsz=(640, 640), fp16=False, vid_stride=1, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic_nms=False, max_det=1000, device=torch.device('cpu'))
     except KeyboardInterrupt:
         intrusion_detection.annotation_intrusion()
 
