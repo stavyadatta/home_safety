@@ -2,7 +2,7 @@ import os
 import torch
 import sys
 
-sys.path.insert(0, '../../yolov5/')
+sys.path.insert(0, '../yolov5/')
 
 from utils.dataloaders import LoadImages, LoadStreams, LoadScreenshots
 from utils.general import (LOGGER)
