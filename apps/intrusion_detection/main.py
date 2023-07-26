@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import argparse
 
+sys.path.insert(0, '../../utils/')
 from model_loader import Model
 from dataloader import load_dataset
 from tracker import Tracker
