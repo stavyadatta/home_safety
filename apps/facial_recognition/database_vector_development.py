@@ -1,7 +1,4 @@
-import sys
 import cv2
-import onnx
-import pickle
 import numpy as np
 import onnxruntime as ort
 from pathlib import Path
